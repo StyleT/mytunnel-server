@@ -1,13 +1,13 @@
-FROM node:10.1.0-alpine
+FROM node:14-alpine
 
-WORKDIR /app
+WORKDIR /codebase
 
-COPY package.json /app/
-COPY yarn.lock /app/
+COPY package.json /codebase/
+COPY package-lock.json /codebase/
 
-RUN yarn install --production && yarn cache clean
+RUN npm install --production
 
-COPY . /app
+COPY . /codebase
 
 ENV NODE_ENV production
-ENTRYPOINT ["node", "-r", "esm", "./bin/server"]
+ENTRYPOINT ["./bin/server.js"]
