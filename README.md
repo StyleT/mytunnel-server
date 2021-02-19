@@ -52,6 +52,7 @@ WantedBy=multi-user.target
 
 Setup flow:
 ```bash
+sudo setcap CAP_NET_BIND_SERVICE=+eip /usr/bin/node # allow non root access to bind below port number 1024
 sudo vi /etc/systemd/system/mytunnel.service
 sudo systemctl start mytunnel
 sudo systemctl enable mytunnel # Add to autoload
