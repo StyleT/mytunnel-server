@@ -3,6 +3,7 @@ import tldjs from 'tldjs';
 import Debug from 'debug';
 import http from 'http';
 import Router from 'koa-router';
+import WsServer from './lib/WsServer.js';
 
 import ClientManager from './lib/ClientManager.js';
 
@@ -19,6 +20,7 @@ export default function(opt) {
     }
 
     const manager = new ClientManager(opt);
+    const wss = new WsServer(manager);
 
     const schema = opt.secure ? 'https' : 'http';
 
@@ -140,19 +142,19 @@ export default function(opt) {
     server.on('upgrade', (req, socket, head) => {
         const hostname = req.headers.host;
         if (!hostname) {
-            socket.destroy();
+            wss.handleUpgrade(req, socket, head);
             return;
         }
 
         const clientId = GetClientIdFromHostname(hostname);
         if (!clientId) {
-            socket.destroy();
+            wss.handleUpgrade(req, socket, head);
             return;
         }
 
         const client = manager.getClient(clientId);
         if (!client) {
-            socket.destroy();
+            wss.handleUpgrade(req, socket, head);
             return;
         }
 
