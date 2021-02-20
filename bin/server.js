@@ -8,7 +8,7 @@ import Debug from 'debug';
 
 import CreateServer from '../server.js';
 
-const debug = Debug('localtunnel');
+const debug = Debug('mytunnel');
 
 const argv = optimist
     .usage('Usage: $0 --port [num]')

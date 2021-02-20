@@ -7,14 +7,13 @@ import Router from 'koa-router';
 
 import ClientManager from './lib/ClientManager.js';
 
-const debug = Debug('localtunnel:server');
+const debug = Debug('mytunnel:server');
 
 export default function(opt) {
     opt = opt || {};
 
     const validHosts = (opt.domain) ? [opt.domain] : undefined;
     const myTldjs = tldjs.fromUserSettings({ validHosts });
-    const landingPage = opt.landing || 'https://localtunnel.github.io/www/';
 
     function GetClientIdFromHostname(hostname) {
         return myTldjs.getSubdomain(hostname);
@@ -28,9 +27,8 @@ export default function(opt) {
     const router = new Router();
 
     router.get('/api/status', async (ctx, next) => {
-        const stats = manager.stats;
         ctx.body = {
-            tunnelsCount: stats.tunnels,
+            tunnelsCount: manager.stats.tunnels,
             tunnels: manager.getClients(),
             mem: process.memoryUsage(),
         };
@@ -76,7 +74,8 @@ export default function(opt) {
         }
 
         // no new client request, send to landing page
-        ctx.redirect(landingPage);
+        ctx.status = 400;
+        ctx.body = 'Bad request';
     });
 
     // anything after the / path is a request for a specific client name

@@ -33,6 +33,6 @@
   "scripts": {
     "test": "mocha --check-leaks **/*.test.js",
     "start": "./bin/server.js",
-    "dev": "nodemon bin/server.js --port 3000"
+    "dev": "DEBUG=mytunnel* nodemon bin/server.js --port 3000"
   }
 }
