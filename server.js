@@ -2,7 +2,6 @@ import Koa from 'koa';
 import tldjs from 'tldjs';
 import Debug from 'debug';
 import http from 'http';
-import { hri } from 'human-readable-ids';
 import Router from 'koa-router';
 
 import ClientManager from './lib/ClientManager.js';
@@ -63,12 +62,9 @@ export default function(opt) {
 
         const isNewClientRequest = ctx.query['new'] !== undefined;
         if (isNewClientRequest) {
-            const reqId = hri.random();
-            debug('making new client with id %s', reqId);
-            const info = await manager.newClient(reqId);
+            const info = await manager.newClient();
 
-            const url = schema + '://' + info.id + '.' + ctx.request.host;
-            info.url = url;
+            info.url = schema + '://' + info.id + '.' + ctx.request.host;
             ctx.body = info;
             return;
         }
@@ -103,7 +99,6 @@ export default function(opt) {
             return;
         }
 
-        debug('making new client with id %s', reqId);
         const info = await manager.newClient(reqId);
 
         const url = schema + '://' + info.id + '.' + ctx.request.host;
