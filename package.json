@@ -21,6 +21,8 @@
     "koa-router": "7.4.0",
     "localenv": "0.2.2",
     "optimist": "0.6.1",
+    "pem": "1.14.4",
+    "pem-promise": "1.0.0",
     "pump": "3.0.0",
     "tldjs": "2.3.1"
   },

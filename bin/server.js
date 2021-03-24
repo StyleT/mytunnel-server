@@ -5,9 +5,9 @@ import optimist from 'optimist';
 
 import log from 'book';
 import Debug from 'debug';
-
+import pemPromise from 'pem-promise';
 import CreateServer from '../server.js';
-
+import fs from 'fs';
 const debug = Debug('mytunnel');
 
 const argv = optimist
@@ -40,6 +40,9 @@ const argv = optimist
     .options('tunnel-ssl-ca', {
         describe: 'the certificate authority chain for the ssl cert that is used to encrypt the tunnel'
     })
+    .options('enable-tunnel-ssl', {
+        describe: 'tells the tunnel to enable SSL'
+    })
     .options('web-cert', {
         describe: 'the ssl cert for the main web page'
     })
@@ -49,13 +52,29 @@ const argv = optimist
     .options('web-ca', {
         describe: 'the ssl ca for the main web page'
     })
+    .options('auto-generate-cert', {
+        describe: 'enabling this flag will automatically generate the server certs for you'
+    })
     .argv;
 
 if (argv.help) {
     optimist.showHelp();
     process.exit();
 }
+if (!argv['auto-generate-cert'] && argv['enable-tunnel-ssl']) {
+    argv['tunnel-ssl-key'] = fs.readFileSync(argv['tunnel-ssl-key'])
+    argv['tunnel-ssl-cert'] = fs.readFileSync(argv['tunnel-ssl-cert'])
+    argv['tunnel-ssl-ca'] = fs.readFileSync(argv['tunnel-ssl-ca'])
+}
+if (argv['auto-generate-cert']) {
+    await pemPromise.createCertificate().then((keys) => {
+            argv['tunnel-ssl-key'] = keys.serviceKey
+            argv['tunnel-ssl-cert'] = keys.certificate
+            argv['tunnel-ssl-ca'] = keys.certificate
+        }
+    );
 
+}
 const server = CreateServer({
     max_tcp_sockets: argv['max-sockets'],
     secure: argv.secure,
