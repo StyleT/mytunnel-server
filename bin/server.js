@@ -40,6 +40,15 @@ const argv = optimist
     .options('tunnel-ssl-ca', {
         describe: 'the certificate authority chain for the ssl cert that is used to encrypt the tunnel'
     })
+    .options('web-cert', {
+        describe: 'the ssl cert for the main web page'
+    })
+    .options('web-key', {
+        describe: 'the ssl key for the main web page'
+    })
+    .options('web-ca', {
+        describe: 'the ssl ca for the main web page'
+    })
     .argv;
 
 if (argv.help) {
@@ -53,7 +62,10 @@ const server = CreateServer({
     domain: argv.domain,
     key: argv['tunnel-ssl-key'],
     cert: argv['tunnel-ssl-cert'],
-    ca: argv['tunnel-ssl-ca']
+    ca: argv['tunnel-ssl-ca'],
+    webcert: argv['web-cert'],
+    webkey: argv['web-key'],
+    webca: argv['web-ca']
 });
 
 server.listen(argv.port, argv.address, () => {

@@ -2,6 +2,7 @@ import Koa from 'koa';
 import tldjs from 'tldjs';
 import Debug from 'debug';
 import http from 'http';
+import https from 'https';
 import { hri } from 'human-readable-ids';
 import Router from 'koa-router';
 
@@ -111,9 +112,7 @@ export default function(opt) {
         ctx.body = info;
         return;
     });
-
-    const server = http.createServer();
-
+    let server = !opt.webcert ? http.createServer(): https.createServer({cert: fs.readFileSync(opt.webcert), key: fs.readFileSync(opt.webkey), ca: fs.readFileSync(opt.webca), minVersion: 'TLSv1.2'})
     const appCallback = app.callback();
 
     server.on('request', (req, res) => {
