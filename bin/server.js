@@ -31,6 +31,15 @@ const argv = optimist
         default: 10,
         describe: 'maximum number of tcp sockets each client is allowed to establish at one time (the tunnels)'
     })
+    .options('tunnel-ssl-cert', {
+        describe: 'the ssl cert for encrypting the tunnel'
+    })
+    .options('tunnel-ssl-key', {
+        describe: 'the ssl key for encrypting the tunnel'
+    })
+    .options('tunnel-ssl-ca', {
+        describe: 'the certificate authority chain for the ssl cert that is used to encrypt the tunnel'
+    })
     .argv;
 
 if (argv.help) {
@@ -42,6 +51,9 @@ const server = CreateServer({
     max_tcp_sockets: argv['max-sockets'],
     secure: argv.secure,
     domain: argv.domain,
+    key: argv['tunnel-ssl-key'],
+    cert: argv['tunnel-ssl-cert'],
+    ca: argv['tunnel-ssl-ca']
 });
 
 server.listen(argv.port, argv.address, () => {

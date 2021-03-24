@@ -6,7 +6,7 @@ import { hri } from 'human-readable-ids';
 import Router from 'koa-router';
 
 import ClientManager from './lib/ClientManager.js';
-
+import fs from 'fs';
 const debug = Debug('mytunnel:server');
 
 export default function(opt) {
