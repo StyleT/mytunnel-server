@@ -8,6 +8,7 @@ import Debug from 'debug';
 import pemPromise from 'pem-promise';
 import CreateServer from '../server.js';
 import fs from 'fs';
+import axios from 'axios';
 const debug = Debug('mytunnel');
 
 const argv = optimist
@@ -55,6 +56,12 @@ const argv = optimist
     .options('auto-generate-cert', {
         describe: 'enabling this flag will automatically generate the server certs for you'
     })
+    .options('override-tunnel-ip', {
+        describe: 'override the ip to connect to when establishing sockets, usually meant to be used if you are using a external load balancer'
+    })
+    .options('auto-discover-tunnel-ip', {
+        describe: 'automatically descover the tunnel public ip via the AWS checkip endpoint'
+    })
     .argv;
 
 if (argv.help) {
@@ -75,6 +82,12 @@ if (argv['auto-generate-cert']) {
     );
 
 }
+if (argv['auto-discover-tunnel-ip']) {
+    await axios.get("http://checkip.amazonaws.com")
+        .then((response) => {
+            argv['override-tunnel-ip'] = response.data.split("\n")[0]
+        })
+}
 const server = CreateServer({
     max_tcp_sockets: argv['max-sockets'],
     secure: argv.secure,
@@ -84,7 +97,8 @@ const server = CreateServer({
     ca: argv['tunnel-ssl-ca'],
     webcert: argv['web-cert'],
     webkey: argv['web-key'],
-    webca: argv['web-ca']
+    webca: argv['web-ca'],
+    OverrideTunnelIp: argv['override-tunnel-ip']
 });
 
 server.listen(argv.port, argv.address, () => {

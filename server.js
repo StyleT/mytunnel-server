@@ -12,7 +12,6 @@ const debug = Debug('mytunnel:server');
 
 export default function(opt) {
     opt = opt || {};
-
     const validHosts = (opt.domain) ? [opt.domain] : undefined;
     const myTldjs = tldjs.fromUserSettings({ validHosts });
 
@@ -108,7 +107,9 @@ export default function(opt) {
         const info = await manager.newClient(reqId);
 
         const url = schema + '://' + info.id + '.' + ctx.request.host;
-        info.url = url;
+        info.url = url;        
+        console.log(info)
+        info.OverrideTunnelIp = opt.OverrideTunnelIp;
         ctx.body = info;
         return;
     });
