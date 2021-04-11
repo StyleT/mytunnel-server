@@ -2,16 +2,16 @@ import Koa from 'koa';
 import tldjs from 'tldjs';
 import Debug from 'debug';
 import http from 'http';
+import https from 'https';
 import { hri } from 'human-readable-ids';
 import Router from 'koa-router';
 
 import ClientManager from './lib/ClientManager.js';
-
+import fs from 'fs';
 const debug = Debug('mytunnel:server');
 
 export default function(opt) {
     opt = opt || {};
-
     const validHosts = (opt.domain) ? [opt.domain] : undefined;
     const myTldjs = tldjs.fromUserSettings({ validHosts });
 
@@ -107,13 +107,13 @@ export default function(opt) {
         const info = await manager.newClient(reqId);
 
         const url = schema + '://' + info.id + '.' + ctx.request.host;
-        info.url = url;
+        info.url = url;        
+        console.log(info)
+        info.OverrideTunnelIp = opt.OverrideTunnelIp;
         ctx.body = info;
         return;
     });
-
-    const server = http.createServer();
-
+    let server = !opt.webcert ? http.createServer(): https.createServer({cert: fs.readFileSync(opt.webcert), key: fs.readFileSync(opt.webkey), ca: fs.readFileSync(opt.webca), minVersion: 'TLSv1.2'})
     const appCallback = app.callback();
 
     server.on('request', (req, res) => {
